@@ -7,7 +7,6 @@
 <meta name="description" content="Interactive dashboard tracking Saudi Vision 2030 economic diversification KPIs using real public data from GASTAT, MISA, and Monsha'at." />
 <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
   html, body { margin: 0; padding: 0; background: #F7F5F0; }
@@ -18,10 +17,6 @@
 <div id="root"></div>
 
 <script type="text/babel" data-presets="react">
-const {
-  LineChart, Line, BarChart, Bar, Cell, XAxis, YAxis,
-  CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, ReferenceArea
-} = Recharts;
 
 
 const RAW = [{"year":2016,"kpi":"Non-oil GDP contribution (% of real GDP)","value":53.5,"unit":"%","target":65,"source":"GASTAT","notes":"GASTAT historical estimate (pre-2025 rebase), approx."},{"year":2017,"kpi":"Non-oil GDP contribution (% of real GDP)","value":53.8,"unit":"%","target":65,"source":"GASTAT","notes":"GASTAT historical estimate (pre-2025 rebase), approx."},{"year":2018,"kpi":"Non-oil GDP contribution (% of real GDP)","value":54,"unit":"%","target":65,"source":"GASTAT","notes":"GASTAT historical estimate (pre-2025 rebase), approx."},{"year":2019,"kpi":"Non-oil GDP contribution (% of real GDP)","value":55.5,"unit":"%","target":65,"source":"GASTAT","notes":"GASTAT historical estimate (pre-2025 rebase), approx."},{"year":2020,"kpi":"Non-oil GDP contribution (% of real GDP)","value":56,"unit":"%","target":65,"source":"GASTAT","notes":"Oil price collapse year; non-oil share rose mechanically as oil GDP fell."},{"year":2021,"kpi":"Non-oil GDP contribution (% of real GDP)","value":53,"unit":"%","target":65,"source":"GASTAT","notes":"Oil price/production recovery diluted non-oil share."},{"year":2022,"kpi":"Non-oil GDP contribution (% of real GDP)","value":50,"unit":"%","target":65,"source":"GASTAT","notes":"Oil GDP surge (high oil prices) — GASTAT Q1 2024 release cites non-oil at ~50% of current-price GDP for this period."},{"year":2023,"kpi":"Non-oil GDP contribution (% of real GDP)","value":50,"unit":"%","target":65,"source":"GASTAT","notes":"GASTAT: non-oil activities ~50% of GDP at current prices (Q1 2024 release)."},{"year":2024,"kpi":"Non-oil GDP contribution (% of real GDP)","value":55,"unit":"%","target":65,"source":"GASTAT","notes":"Post-2025 GASTAT rebase (2023 base year): non-oil real GDP grew 4.3% in 2024; rebased non-oil GDP growth ~4.5% real terms."},{"year":2025,"kpi":"Non-oil GDP contribution (% of real GDP)","value":55,"unit":"%","target":65,"source":"GASTAT","notes":"2025 Vision 2030 Annual Report: non-oil activities at 55% of real GDP (rebased methodology)."},{"year":2016,"kpi":"Saudi national unemployment rate (%)","value":12.1,"unit":"%","target":5,"source":"GASTAT","notes":"Pre-Vision 2030 baseline period."},{"year":2017,"kpi":"Saudi national unemployment rate (%)","value":12.8,"unit":"%","target":5,"source":"GASTAT","notes":"GASTAT Labour Force Survey."},{"year":2018,"kpi":"Saudi national unemployment rate (%)","value":12.9,"unit":"%","target":5,"source":"GASTAT","notes":"Historical peak cited in multiple Vision 2030 progress reports."},{"year":2019,"kpi":"Saudi national unemployment rate (%)","value":12,"unit":"%","target":5,"source":"GASTAT","notes":"GASTAT Labour Force Survey."},{"year":2020,"kpi":"Saudi national unemployment rate (%)","value":14.9,"unit":"%","target":5,"source":"GASTAT","notes":"COVID-19 labour market shock — temporary spike."},{"year":2021,"kpi":"Saudi national unemployment rate (%)","value":11,"unit":"%","target":5,"source":"GASTAT","notes":"Recovery post-COVID."},{"year":2022,"kpi":"Saudi national unemployment rate (%)","value":8,"unit":"%","target":5,"source":"GASTAT","notes":"Vision 2030's original 2030 target (8%) reached ~8 years early."},{"year":2023,"kpi":"Saudi national unemployment rate (%)","value":7.7,"unit":"%","target":5,"source":"GASTAT","notes":"GASTAT Labour Force Survey Q4 2023."},{"year":2024,"kpi":"Saudi national unemployment rate (%)","value":7,"unit":"%","target":5,"source":"GASTAT","notes":"GASTAT Q4 2024 — target revised down to 5% by 2030 given early achievement of original 8% goal."},{"year":2025,"kpi":"Saudi national unemployment rate (%)","value":7,"unit":"%","target":5,"source":"GASTAT","notes":"Held near 7% through 2025 per GASTAT quarterly releases; revised national target now 5% by 2030."},{"year":2016,"kpi":"FDI net inflows (USD billion)","value":7.45,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"Pre-rebase (old SAMA/SAGIA methodology)."},{"year":2017,"kpi":"FDI net inflows (USD billion)","value":1.42,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"Pre-rebase. Lowest point in the series — coincides with early reform uncertainty."},{"year":2018,"kpi":"FDI net inflows (USD billion)","value":4.25,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"Pre-rebase (old methodology)."},{"year":2019,"kpi":"FDI net inflows (USD billion)","value":4.56,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"Pre-rebase (old methodology). Macrotrends/World Bank series."},{"year":2020,"kpi":"FDI net inflows (USD billion)","value":1.62,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"Pre-rebase. COVID-19 era trough."},{"year":2021,"kpi":"FDI net inflows (USD billion)","value":19.29,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"New MISA methodology (2024 rebase) shows much higher figure than originally published; one-off Aramco infrastructure deal contributed materially."},{"year":2022,"kpi":"FDI net inflows (USD billion)","value":26.71,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"New MISA methodology. New figures ~62% higher than old statistics for 2020-22 combined, partly reflecting a large Aramco pipeline deal."},{"year":2023,"kpi":"FDI net inflows (USD billion)","value":25.6,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"MISA official 2023 report: SAR 96bn (~$25.6bn), 16% above the National Investment Strategy target for the year."},{"year":2024,"kpi":"FDI net inflows (USD billion)","value":22,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"Indicative — official 2024 full-year MISA report figure; treat as approximate pending confirmation against final MISA annual report."},{"year":2025,"kpi":"FDI net inflows (USD billion)","value":24,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"Indicative estimate based on quarterly net FDI run-rate reported by SAMA/CEIC through 2025; confirm against final MISA 2025 annual report before citing precisely."},{"year":2016,"kpi":"SME contribution to GDP (%)","value":20,"unit":"%","target":35,"source":"Monsha'at","notes":"Monsha'at baseline at program launch."},{"year":2017,"kpi":"SME contribution to GDP (%)","value":20,"unit":"%","target":35,"source":"Monsha'at","notes":"Monsha'at — limited annual movement reported in early years."},{"year":2018,"kpi":"SME contribution to GDP (%)","value":20,"unit":"%","target":35,"source":"Monsha'at","notes":"Monsha'at SME Monitor."},{"year":2019,"kpi":"SME contribution to GDP (%)","value":22,"unit":"%","target":35,"source":"Monsha'at","notes":"Monsha'at SME Monitor reports gradual increase."},{"year":2020,"kpi":"SME contribution to GDP (%)","value":22,"unit":"%","target":35,"source":"Monsha'at","notes":"Monsha'at — COVID-19 period; growth plateaued."},{"year":2021,"kpi":"SME contribution to GDP (%)","value":23,"unit":"%","target":35,"source":"Monsha'at","notes":"Argaam-reported Monsha'at governor statement put SME GDP contribution at 28.7% in March 2021 — note this figure has not been consistently repeated in later official communications, illustrating reporting volatility in this KPI."},{"year":2022,"kpi":"SME contribution to GDP (%)","value":23,"unit":"%","target":35,"source":"Monsha'at","notes":"Monsha'at SME Monitor / Investment Climate Statement series."},{"year":2023,"kpi":"SME contribution to GDP (%)","value":23,"unit":"%","target":35,"source":"Monsha'at","notes":"Most frequently cited figure across 2023-2025 secondary sources (~23%)."},{"year":2024,"kpi":"SME contribution to GDP (%)","value":23,"unit":"%","target":35,"source":"Monsha'at","notes":"Monsha'at — active SME registrations reached record highs (1.7M by 2025) but GDP-share metric is reported infrequently/inconsistently."},{"year":2025,"kpi":"SME contribution to GDP (%)","value":23,"unit":"%","target":35,"source":"Monsha'at","notes":"Held flat in most recent secondary reporting; official Monsha'at GDP-contribution figure for 2025 not yet located in a single authoritative bulletin — flagged as lowest-confidence series in this dataset."}];
@@ -67,6 +62,7 @@ function statusOf(kpi, series) {
 
 function Dashboard() {
   const [activeIdx, setActiveIdx] = React.useState(0);
+  const [hoverPoint, setHoverPoint] = React.useState(null);
   const active = KPIS[activeIdx];
 
   const series = React.useMemo(() => {
@@ -126,7 +122,7 @@ function Dashboard() {
           const last = kSeries[kSeries.length - 1];
           const st = statusOf(k, kSeries);
           return (
-            <div key={k.key} className="kpi-tab" onClick={() => setActiveIdx(i)}
+            <div key={k.key} className="kpi-tab" onClick={() => { setActiveIdx(i); setHoverPoint(null); }}
               style={{
                 flex: 1, padding: '14px 18px', borderBottom: isActive ? '3px solid #C9A24B' : '3px solid transparent',
                 background: isActive ? '#0B1F3A06' : 'transparent',
@@ -167,22 +163,7 @@ function Dashboard() {
 
         {/* Trend chart */}
         <Panel title={`${active.short} — Trend & Rolling 3-Year Average`}>
-          <ResponsiveContainer width="100%" height={280}>
-            <LineChart data={series} margin={{ top: 10, right: 24, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#0B1F3A12" />
-              <XAxis dataKey="year" tick={{ fontSize: 11, fontFamily: 'JetBrains Mono', fill: '#5A6472' }} axisLine={{ stroke: '#0B1F3A22' }} />
-              <YAxis tick={{ fontSize: 11, fontFamily: 'JetBrains Mono', fill: '#5A6472' }} axisLine={{ stroke: '#0B1F3A22' }} />
-              <Tooltip content={<CustomTooltip fmt={active.fmt} />} />
-              <ReferenceLine y={active.target} stroke="#C9A24B" strokeDasharray="4 4" strokeWidth={1.5}
-                label={{ value: `2030 target: ${active.fmt(active.target)}`, position: 'insideTopRight', fontSize: 11, fill: '#C9A24B', fontWeight: 600 }} />
-              {active.breakYear && (
-                <ReferenceLine x={active.breakYear} stroke="#B23A2F" strokeDasharray="2 2" strokeWidth={1.5}
-                  label={{ value: 'methodology rebase', angle: -90, position: 'insideTopLeft', fontSize: 10, fill: '#B23A2F', fontWeight: 600 }} />
-              )}
-              <Line type="monotone" dataKey="value" stroke="#0B1F3A" strokeWidth={2.5} dot={{ r: 3, fill: '#0B1F3A' }} name="Actual" />
-              <Line type="monotone" dataKey="rolling" stroke="#1B7A5A" strokeWidth={2} strokeDasharray="5 3" dot={false} name="Rolling 3Y Avg" />
-            </LineChart>
-          </ResponsiveContainer>
+          <TrendChart series={series} kpi={active} hover={hoverPoint} setHover={setHoverPoint} />
           <Legend items={[
             { color: '#0B1F3A', label: 'Actual value', dash: false },
             { color: '#1B7A5A', label: 'Rolling 3-year average', dash: true },
@@ -192,22 +173,7 @@ function Dashboard() {
 
         {/* YoY chart */}
         <Panel title={`${active.short} — Year-over-Year Variance`}>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={yoySeries.filter(d => d.yoy !== null)} margin={{ top: 10, right: 24, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#0B1F3A12" />
-              <XAxis dataKey="year" tick={{ fontSize: 11, fontFamily: 'JetBrains Mono', fill: '#5A6472' }} axisLine={{ stroke: '#0B1F3A22' }} />
-              <YAxis tick={{ fontSize: 11, fontFamily: 'JetBrains Mono', fill: '#5A6472' }} axisLine={{ stroke: '#0B1F3A22' }}
-                tickFormatter={v => `${v}%`} />
-              <Tooltip content={<YoYTooltip />} />
-              <ReferenceLine y={0} stroke="#0B1F3A44" />
-              <Bar dataKey="yoy" radius={[3, 3, 0, 0]}>
-                {yoySeries.filter(d => d.yoy !== null).map((d, i) => {
-                  const good = active.direction === 'down' ? d.yoy < 0 : d.yoy > 0;
-                  return <Cell key={`c-${i}`} fill={good ? '#1B7A5A' : '#B23A2F'} />;
-                })}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+          <YoYChart series={yoySeries} kpi={active} />
         </Panel>
 
         {/* Drill-down table */}
@@ -297,25 +263,132 @@ function Legend({ items }) {
   );
 }
 
-function CustomTooltip({ active, payload, label, fmt }) {
-  if (!active || !payload || !payload.length) return null;
-  const d = payload[0] && payload[0].payload;
-  if (!d || typeof d.value !== 'number') return null;
+function TrendChart({ series, kpi, hover, setHover }) {
+  const W = 700, H = 280;
+  const padL = 48, padR = 24, padT = 20, padB = 32;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+
+  const values = series.map(d => d.value);
+  const rollingValues = series.map(d => d.rolling);
+  const allVals = [...values, ...rollingValues, kpi.target];
+  const minV = Math.min(...allVals) * 0.92;
+  const maxV = Math.max(...allVals) * 1.08;
+
+  const x = (i) => padL + (i / (series.length - 1)) * plotW;
+  const y = (v) => padT + plotH - ((v - minV) / (maxV - minV)) * plotH;
+
+  const linePath = (key) => series.map((d, i) => `${i === 0 ? 'M' : 'L'} ${x(i)} ${y(d[key])}`).join(' ');
+
+  const yTicks = 4;
+  const tickVals = Array.from({ length: yTicks + 1 }, (_, i) => minV + (i / yTicks) * (maxV - minV));
+
+  const breakIdx = kpi.breakYear ? series.findIndex(d => d.year === kpi.breakYear) : -1;
+
   return (
-    <div style={{ background: '#0B1F3A', color: '#F7F5F0', padding: '10px 12px', borderRadius: 4, fontSize: 12, maxWidth: 260 }}>
-      <div className="mono" style={{ fontWeight: 700, marginBottom: 4 }}>{label}: {fmt(d.value)}</div>
-      <div style={{ color: '#8FA0BC', lineHeight: 1.4 }}>{d.notes}</div>
+    <div style={{ position: 'relative' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 280, display: 'block' }}>
+        {/* grid lines */}
+        {tickVals.map((tv, i) => (
+          <g key={i}>
+            <line x1={padL} x2={W - padR} y1={y(tv)} y2={y(tv)} stroke="#0B1F3A12" strokeDasharray="3 3" />
+            <text x={padL - 8} y={y(tv)} textAnchor="end" dominantBaseline="middle" fontSize="10" fontFamily="JetBrains Mono" fill="#5A6472">
+              {tv.toFixed(0)}
+            </text>
+          </g>
+        ))}
+        {/* x axis labels */}
+        {series.map((d, i) => (
+          <text key={d.year} x={x(i)} y={H - 10} textAnchor="middle" fontSize="10" fontFamily="JetBrains Mono" fill="#5A6472">
+            {d.year}
+          </text>
+        ))}
+        {/* target line */}
+        <line x1={padL} x2={W - padR} y1={y(kpi.target)} y2={y(kpi.target)} stroke="#C9A24B" strokeDasharray="4 4" strokeWidth="1.5" />
+        <text x={W - padR} y={y(kpi.target) - 6} textAnchor="end" fontSize="11" fontWeight="600" fill="#C9A24B">
+          2030 target: {kpi.fmt(kpi.target)}
+        </text>
+        {/* methodology break marker */}
+        {breakIdx >= 0 && (
+          <g>
+            <line x1={x(breakIdx)} x2={x(breakIdx)} y1={padT} y2={padT + plotH} stroke="#B23A2F" strokeDasharray="2 2" strokeWidth="1.5" />
+            <text x={x(breakIdx) + 4} y={padT + 10} fontSize="10" fontWeight="600" fill="#B23A2F">methodology rebase</text>
+          </g>
+        )}
+        {/* rolling average line */}
+        <path d={linePath('rolling')} fill="none" stroke="#1B7A5A" strokeWidth="2" strokeDasharray="5 3" />
+        {/* actual line */}
+        <path d={linePath('value')} fill="none" stroke="#0B1F3A" strokeWidth="2.5" />
+        {/* dots + hover targets */}
+        {series.map((d, i) => (
+          <g key={d.year}>
+            <circle cx={x(i)} cy={y(d.value)} r="3" fill="#0B1F3A" />
+            <circle cx={x(i)} cy={y(d.value)} r="10" fill="transparent"
+              onMouseEnter={() => setHover({ ...d, cx: x(i), cy: y(d.value) })}
+              onMouseLeave={() => setHover(null)}
+              style={{ cursor: 'pointer' }} />
+          </g>
+        ))}
+      </svg>
+      {hover && (
+        <div style={{
+          position: 'absolute', left: `${(hover.cx / W) * 100}%`, top: Math.max(0, (hover.cy / H) * 280 - 70),
+          transform: 'translateX(-50%)', background: '#0B1F3A', color: '#F7F5F0', padding: '8px 10px',
+          borderRadius: 4, fontSize: 12, maxWidth: 220, pointerEvents: 'none', zIndex: 10,
+        }}>
+          <div className="mono" style={{ fontWeight: 700, marginBottom: 4 }}>{hover.year}: {kpi.fmt(hover.value)}</div>
+          <div style={{ color: '#8FA0BC', lineHeight: 1.4, fontSize: 11 }}>{hover.notes}</div>
+        </div>
+      )}
     </div>
   );
 }
 
-function YoYTooltip({ active, payload, label }) {
-  if (!active || !payload || !payload.length) return null;
-  const v = payload[0] && payload[0].value;
-  if (typeof v !== 'number') return null;
+function YoYChart({ series, kpi }) {
+  const [hoverIdx, setHoverIdx] = React.useState(null);
+  const pts = series.filter(d => d.yoy !== null);
+  const W = 700, H = 200;
+  const padL = 44, padR = 24, padT = 16, padB = 28;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+
+  const vals = pts.map(d => d.yoy);
+  const maxAbs = Math.max(Math.abs(Math.min(...vals)), Math.abs(Math.max(...vals))) * 1.2 || 1;
+  const minV = -maxAbs, maxV = maxAbs;
+
+  const barW = plotW / pts.length * 0.6;
+  const x = (i) => padL + (i + 0.5) / pts.length * plotW;
+  const y = (v) => padT + plotH - ((v - minV) / (maxV - minV)) * plotH;
+  const zeroY = y(0);
+
   return (
-    <div style={{ background: '#0B1F3A', color: '#F7F5F0', padding: '8px 12px', borderRadius: 4, fontSize: 12 }} className="mono">
-      {label}: {v > 0 ? '+' : ''}{v.toFixed(1)}%
+    <div style={{ position: 'relative' }}>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 200, display: 'block' }}>
+        <line x1={padL} x2={W - padR} y1={zeroY} y2={zeroY} stroke="#0B1F3A44" />
+        {pts.map((d, i) => {
+          const good = kpi.direction === 'down' ? d.yoy < 0 : d.yoy > 0;
+          const barTop = Math.min(zeroY, y(d.yoy));
+          const barH = Math.abs(y(d.yoy) - zeroY);
+          return (
+            <g key={d.year}>
+              <rect x={x(i) - barW / 2} y={barTop} width={barW} height={Math.max(barH, 1)}
+                fill={good ? '#1B7A5A' : '#B23A2F'} rx="2"
+                onMouseEnter={() => setHoverIdx(i)} onMouseLeave={() => setHoverIdx(null)}
+                style={{ cursor: 'pointer' }} />
+              <text x={x(i)} y={H - 8} textAnchor="middle" fontSize="10" fontFamily="JetBrains Mono" fill="#5A6472">{d.year}</text>
+            </g>
+          );
+        })}
+      </svg>
+      {hoverIdx !== null && (
+        <div style={{
+          position: 'absolute', left: `${(x(hoverIdx) / W) * 100}%`, top: 0,
+          transform: 'translateX(-50%)', background: '#0B1F3A', color: '#F7F5F0', padding: '6px 10px',
+          borderRadius: 4, fontSize: 12, pointerEvents: 'none', whiteSpace: 'nowrap',
+        }} className="mono">
+          {pts[hoverIdx].year}: {pts[hoverIdx].yoy > 0 ? '+' : ''}{pts[hoverIdx].yoy.toFixed(1)}%
+        </div>
+      )}
     </div>
   );
 }
