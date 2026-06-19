@@ -5,42 +5,408 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Saudi Vision 2030 — KPI Intelligence Dashboard</title>
 <meta name="description" content="Interactive dashboard tracking Saudi Vision 2030 economic diversification KPIs using real public data from GASTAT, MISA, and Monsha'at." />
-<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <style>
   html, body { margin: 0; padding: 0; background: #F7F5F0; }
   #root { min-height: 100vh; }
+  #load-error { display:none; font-family: sans-serif; padding: 40px; color: #B23A2F; }
 </style>
 </head>
 <body>
 <div id="root"></div>
+<div id="load-error">
+  <strong id="load-error-title">Could not load required scripts from the CDN.</strong><br/>
+  Please check your internet connection, disable any ad-blocker/script-blocker for this page, and refresh.
+</div>
 
-<script type="text/babel" data-presets="react">
+<script src="https://cdn.jsdelivr.net/npm/react@18.3.1/umd/react.production.min.js"
+  onerror="document.getElementById('load-error-title').textContent='Could not load React (react.production.min.js) from jsDelivr CDN.'; document.getElementById('load-error').style.display='block'"></script>
+<script src="https://cdn.jsdelivr.net/npm/react-dom@18.3.1/umd/react-dom.production.min.js"
+  onerror="document.getElementById('load-error-title').textContent='Could not load ReactDOM (react-dom.production.min.js) from jsDelivr CDN.'; document.getElementById('load-error').style.display='block'"></script>
 
+<script>
+if (typeof React === 'undefined' || typeof ReactDOM === 'undefined') {
+  document.getElementById('load-error-title').textContent =
+    'Scripts loaded but React/ReactDOM globals are missing (React defined: ' + (typeof React !== 'undefined') + ', ReactDOM defined: ' + (typeof ReactDOM !== 'undefined') + ').';
+  document.getElementById('load-error').style.display = 'block';
+} else {
 
-const RAW = [{"year":2016,"kpi":"Non-oil GDP contribution (% of real GDP)","value":53.5,"unit":"%","target":65,"source":"GASTAT","notes":"GASTAT historical estimate (pre-2025 rebase), approx."},{"year":2017,"kpi":"Non-oil GDP contribution (% of real GDP)","value":53.8,"unit":"%","target":65,"source":"GASTAT","notes":"GASTAT historical estimate (pre-2025 rebase), approx."},{"year":2018,"kpi":"Non-oil GDP contribution (% of real GDP)","value":54,"unit":"%","target":65,"source":"GASTAT","notes":"GASTAT historical estimate (pre-2025 rebase), approx."},{"year":2019,"kpi":"Non-oil GDP contribution (% of real GDP)","value":55.5,"unit":"%","target":65,"source":"GASTAT","notes":"GASTAT historical estimate (pre-2025 rebase), approx."},{"year":2020,"kpi":"Non-oil GDP contribution (% of real GDP)","value":56,"unit":"%","target":65,"source":"GASTAT","notes":"Oil price collapse year; non-oil share rose mechanically as oil GDP fell."},{"year":2021,"kpi":"Non-oil GDP contribution (% of real GDP)","value":53,"unit":"%","target":65,"source":"GASTAT","notes":"Oil price/production recovery diluted non-oil share."},{"year":2022,"kpi":"Non-oil GDP contribution (% of real GDP)","value":50,"unit":"%","target":65,"source":"GASTAT","notes":"Oil GDP surge (high oil prices) — GASTAT Q1 2024 release cites non-oil at ~50% of current-price GDP for this period."},{"year":2023,"kpi":"Non-oil GDP contribution (% of real GDP)","value":50,"unit":"%","target":65,"source":"GASTAT","notes":"GASTAT: non-oil activities ~50% of GDP at current prices (Q1 2024 release)."},{"year":2024,"kpi":"Non-oil GDP contribution (% of real GDP)","value":55,"unit":"%","target":65,"source":"GASTAT","notes":"Post-2025 GASTAT rebase (2023 base year): non-oil real GDP grew 4.3% in 2024; rebased non-oil GDP growth ~4.5% real terms."},{"year":2025,"kpi":"Non-oil GDP contribution (% of real GDP)","value":55,"unit":"%","target":65,"source":"GASTAT","notes":"2025 Vision 2030 Annual Report: non-oil activities at 55% of real GDP (rebased methodology)."},{"year":2016,"kpi":"Saudi national unemployment rate (%)","value":12.1,"unit":"%","target":5,"source":"GASTAT","notes":"Pre-Vision 2030 baseline period."},{"year":2017,"kpi":"Saudi national unemployment rate (%)","value":12.8,"unit":"%","target":5,"source":"GASTAT","notes":"GASTAT Labour Force Survey."},{"year":2018,"kpi":"Saudi national unemployment rate (%)","value":12.9,"unit":"%","target":5,"source":"GASTAT","notes":"Historical peak cited in multiple Vision 2030 progress reports."},{"year":2019,"kpi":"Saudi national unemployment rate (%)","value":12,"unit":"%","target":5,"source":"GASTAT","notes":"GASTAT Labour Force Survey."},{"year":2020,"kpi":"Saudi national unemployment rate (%)","value":14.9,"unit":"%","target":5,"source":"GASTAT","notes":"COVID-19 labour market shock — temporary spike."},{"year":2021,"kpi":"Saudi national unemployment rate (%)","value":11,"unit":"%","target":5,"source":"GASTAT","notes":"Recovery post-COVID."},{"year":2022,"kpi":"Saudi national unemployment rate (%)","value":8,"unit":"%","target":5,"source":"GASTAT","notes":"Vision 2030's original 2030 target (8%) reached ~8 years early."},{"year":2023,"kpi":"Saudi national unemployment rate (%)","value":7.7,"unit":"%","target":5,"source":"GASTAT","notes":"GASTAT Labour Force Survey Q4 2023."},{"year":2024,"kpi":"Saudi national unemployment rate (%)","value":7,"unit":"%","target":5,"source":"GASTAT","notes":"GASTAT Q4 2024 — target revised down to 5% by 2030 given early achievement of original 8% goal."},{"year":2025,"kpi":"Saudi national unemployment rate (%)","value":7,"unit":"%","target":5,"source":"GASTAT","notes":"Held near 7% through 2025 per GASTAT quarterly releases; revised national target now 5% by 2030."},{"year":2016,"kpi":"FDI net inflows (USD billion)","value":7.45,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"Pre-rebase (old SAMA/SAGIA methodology)."},{"year":2017,"kpi":"FDI net inflows (USD billion)","value":1.42,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"Pre-rebase. Lowest point in the series — coincides with early reform uncertainty."},{"year":2018,"kpi":"FDI net inflows (USD billion)","value":4.25,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"Pre-rebase (old methodology)."},{"year":2019,"kpi":"FDI net inflows (USD billion)","value":4.56,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"Pre-rebase (old methodology). Macrotrends/World Bank series."},{"year":2020,"kpi":"FDI net inflows (USD billion)","value":1.62,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"Pre-rebase. COVID-19 era trough."},{"year":2021,"kpi":"FDI net inflows (USD billion)","value":19.29,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"New MISA methodology (2024 rebase) shows much higher figure than originally published; one-off Aramco infrastructure deal contributed materially."},{"year":2022,"kpi":"FDI net inflows (USD billion)","value":26.71,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"New MISA methodology. New figures ~62% higher than old statistics for 2020-22 combined, partly reflecting a large Aramco pipeline deal."},{"year":2023,"kpi":"FDI net inflows (USD billion)","value":25.6,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"MISA official 2023 report: SAR 96bn (~$25.6bn), 16% above the National Investment Strategy target for the year."},{"year":2024,"kpi":"FDI net inflows (USD billion)","value":22,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"Indicative — official 2024 full-year MISA report figure; treat as approximate pending confirmation against final MISA annual report."},{"year":2025,"kpi":"FDI net inflows (USD billion)","value":24,"unit":"$bn","target":100,"source":"MISA / SAMA / World Bank","notes":"Indicative estimate based on quarterly net FDI run-rate reported by SAMA/CEIC through 2025; confirm against final MISA 2025 annual report before citing precisely."},{"year":2016,"kpi":"SME contribution to GDP (%)","value":20,"unit":"%","target":35,"source":"Monsha'at","notes":"Monsha'at baseline at program launch."},{"year":2017,"kpi":"SME contribution to GDP (%)","value":20,"unit":"%","target":35,"source":"Monsha'at","notes":"Monsha'at — limited annual movement reported in early years."},{"year":2018,"kpi":"SME contribution to GDP (%)","value":20,"unit":"%","target":35,"source":"Monsha'at","notes":"Monsha'at SME Monitor."},{"year":2019,"kpi":"SME contribution to GDP (%)","value":22,"unit":"%","target":35,"source":"Monsha'at","notes":"Monsha'at SME Monitor reports gradual increase."},{"year":2020,"kpi":"SME contribution to GDP (%)","value":22,"unit":"%","target":35,"source":"Monsha'at","notes":"Monsha'at — COVID-19 period; growth plateaued."},{"year":2021,"kpi":"SME contribution to GDP (%)","value":23,"unit":"%","target":35,"source":"Monsha'at","notes":"Argaam-reported Monsha'at governor statement put SME GDP contribution at 28.7% in March 2021 — note this figure has not been consistently repeated in later official communications, illustrating reporting volatility in this KPI."},{"year":2022,"kpi":"SME contribution to GDP (%)","value":23,"unit":"%","target":35,"source":"Monsha'at","notes":"Monsha'at SME Monitor / Investment Climate Statement series."},{"year":2023,"kpi":"SME contribution to GDP (%)","value":23,"unit":"%","target":35,"source":"Monsha'at","notes":"Most frequently cited figure across 2023-2025 secondary sources (~23%)."},{"year":2024,"kpi":"SME contribution to GDP (%)","value":23,"unit":"%","target":35,"source":"Monsha'at","notes":"Monsha'at — active SME registrations reached record highs (1.7M by 2025) but GDP-share metric is reported infrequently/inconsistently."},{"year":2025,"kpi":"SME contribution to GDP (%)","value":23,"unit":"%","target":35,"source":"Monsha'at","notes":"Held flat in most recent secondary reporting; official Monsha'at GDP-contribution figure for 2025 not yet located in a single authoritative bulletin — flagged as lowest-confidence series in this dataset."}];
-
-const safeFmt = (fn) => (v) => (typeof v === 'number' && !isNaN(v)) ? fn(v) : '—';
-
-const KPIS = [
-  { key: "Non-oil GDP contribution (% of real GDP)", short: "Non-Oil GDP Share", pillar: "A Thriving Economy", direction: "up", target: 65, fmt: safeFmt(v => `${v.toFixed(1)}%`), breakYear: null },
-  { key: "Saudi national unemployment rate (%)", short: "National Unemployment", pillar: "A Vibrant Society", direction: "down", target: 5, fmt: safeFmt(v => `${v.toFixed(1)}%`), breakYear: null },
-  { key: "FDI net inflows (USD billion)", short: "FDI Net Inflows", pillar: "An Ambitious Nation", direction: "up", target: 100, fmt: safeFmt(v => `$${v.toFixed(1)}bn`), breakYear: 2024 },
-  { key: "SME contribution to GDP (%)", short: "SME GDP Contribution", pillar: "A Thriving Economy", direction: "up", target: 35, fmt: safeFmt(v => `${v.toFixed(1)}%`), breakYear: null },
-];
-
+const RAW = [{
+  "year": 2016,
+  "kpi": "Non-oil GDP contribution (% of real GDP)",
+  "value": 53.5,
+  "unit": "%",
+  "target": 65,
+  "source": "GASTAT",
+  "notes": "GASTAT historical estimate (pre-2025 rebase), approx."
+}, {
+  "year": 2017,
+  "kpi": "Non-oil GDP contribution (% of real GDP)",
+  "value": 53.8,
+  "unit": "%",
+  "target": 65,
+  "source": "GASTAT",
+  "notes": "GASTAT historical estimate (pre-2025 rebase), approx."
+}, {
+  "year": 2018,
+  "kpi": "Non-oil GDP contribution (% of real GDP)",
+  "value": 54,
+  "unit": "%",
+  "target": 65,
+  "source": "GASTAT",
+  "notes": "GASTAT historical estimate (pre-2025 rebase), approx."
+}, {
+  "year": 2019,
+  "kpi": "Non-oil GDP contribution (% of real GDP)",
+  "value": 55.5,
+  "unit": "%",
+  "target": 65,
+  "source": "GASTAT",
+  "notes": "GASTAT historical estimate (pre-2025 rebase), approx."
+}, {
+  "year": 2020,
+  "kpi": "Non-oil GDP contribution (% of real GDP)",
+  "value": 56,
+  "unit": "%",
+  "target": 65,
+  "source": "GASTAT",
+  "notes": "Oil price collapse year; non-oil share rose mechanically as oil GDP fell."
+}, {
+  "year": 2021,
+  "kpi": "Non-oil GDP contribution (% of real GDP)",
+  "value": 53,
+  "unit": "%",
+  "target": 65,
+  "source": "GASTAT",
+  "notes": "Oil price/production recovery diluted non-oil share."
+}, {
+  "year": 2022,
+  "kpi": "Non-oil GDP contribution (% of real GDP)",
+  "value": 50,
+  "unit": "%",
+  "target": 65,
+  "source": "GASTAT",
+  "notes": "Oil GDP surge (high oil prices) — GASTAT Q1 2024 release cites non-oil at ~50% of current-price GDP for this period."
+}, {
+  "year": 2023,
+  "kpi": "Non-oil GDP contribution (% of real GDP)",
+  "value": 50,
+  "unit": "%",
+  "target": 65,
+  "source": "GASTAT",
+  "notes": "GASTAT: non-oil activities ~50% of GDP at current prices (Q1 2024 release)."
+}, {
+  "year": 2024,
+  "kpi": "Non-oil GDP contribution (% of real GDP)",
+  "value": 55,
+  "unit": "%",
+  "target": 65,
+  "source": "GASTAT",
+  "notes": "Post-2025 GASTAT rebase (2023 base year): non-oil real GDP grew 4.3% in 2024; rebased non-oil GDP growth ~4.5% real terms."
+}, {
+  "year": 2025,
+  "kpi": "Non-oil GDP contribution (% of real GDP)",
+  "value": 55,
+  "unit": "%",
+  "target": 65,
+  "source": "GASTAT",
+  "notes": "2025 Vision 2030 Annual Report: non-oil activities at 55% of real GDP (rebased methodology)."
+}, {
+  "year": 2016,
+  "kpi": "Saudi national unemployment rate (%)",
+  "value": 12.1,
+  "unit": "%",
+  "target": 5,
+  "source": "GASTAT",
+  "notes": "Pre-Vision 2030 baseline period."
+}, {
+  "year": 2017,
+  "kpi": "Saudi national unemployment rate (%)",
+  "value": 12.8,
+  "unit": "%",
+  "target": 5,
+  "source": "GASTAT",
+  "notes": "GASTAT Labour Force Survey."
+}, {
+  "year": 2018,
+  "kpi": "Saudi national unemployment rate (%)",
+  "value": 12.9,
+  "unit": "%",
+  "target": 5,
+  "source": "GASTAT",
+  "notes": "Historical peak cited in multiple Vision 2030 progress reports."
+}, {
+  "year": 2019,
+  "kpi": "Saudi national unemployment rate (%)",
+  "value": 12,
+  "unit": "%",
+  "target": 5,
+  "source": "GASTAT",
+  "notes": "GASTAT Labour Force Survey."
+}, {
+  "year": 2020,
+  "kpi": "Saudi national unemployment rate (%)",
+  "value": 14.9,
+  "unit": "%",
+  "target": 5,
+  "source": "GASTAT",
+  "notes": "COVID-19 labour market shock — temporary spike."
+}, {
+  "year": 2021,
+  "kpi": "Saudi national unemployment rate (%)",
+  "value": 11,
+  "unit": "%",
+  "target": 5,
+  "source": "GASTAT",
+  "notes": "Recovery post-COVID."
+}, {
+  "year": 2022,
+  "kpi": "Saudi national unemployment rate (%)",
+  "value": 8,
+  "unit": "%",
+  "target": 5,
+  "source": "GASTAT",
+  "notes": "Vision 2030's original 2030 target (8%) reached ~8 years early."
+}, {
+  "year": 2023,
+  "kpi": "Saudi national unemployment rate (%)",
+  "value": 7.7,
+  "unit": "%",
+  "target": 5,
+  "source": "GASTAT",
+  "notes": "GASTAT Labour Force Survey Q4 2023."
+}, {
+  "year": 2024,
+  "kpi": "Saudi national unemployment rate (%)",
+  "value": 7,
+  "unit": "%",
+  "target": 5,
+  "source": "GASTAT",
+  "notes": "GASTAT Q4 2024 — target revised down to 5% by 2030 given early achievement of original 8% goal."
+}, {
+  "year": 2025,
+  "kpi": "Saudi national unemployment rate (%)",
+  "value": 7,
+  "unit": "%",
+  "target": 5,
+  "source": "GASTAT",
+  "notes": "Held near 7% through 2025 per GASTAT quarterly releases; revised national target now 5% by 2030."
+}, {
+  "year": 2016,
+  "kpi": "FDI net inflows (USD billion)",
+  "value": 7.45,
+  "unit": "$bn",
+  "target": 100,
+  "source": "MISA / SAMA / World Bank",
+  "notes": "Pre-rebase (old SAMA/SAGIA methodology)."
+}, {
+  "year": 2017,
+  "kpi": "FDI net inflows (USD billion)",
+  "value": 1.42,
+  "unit": "$bn",
+  "target": 100,
+  "source": "MISA / SAMA / World Bank",
+  "notes": "Pre-rebase. Lowest point in the series — coincides with early reform uncertainty."
+}, {
+  "year": 2018,
+  "kpi": "FDI net inflows (USD billion)",
+  "value": 4.25,
+  "unit": "$bn",
+  "target": 100,
+  "source": "MISA / SAMA / World Bank",
+  "notes": "Pre-rebase (old methodology)."
+}, {
+  "year": 2019,
+  "kpi": "FDI net inflows (USD billion)",
+  "value": 4.56,
+  "unit": "$bn",
+  "target": 100,
+  "source": "MISA / SAMA / World Bank",
+  "notes": "Pre-rebase (old methodology). Macrotrends/World Bank series."
+}, {
+  "year": 2020,
+  "kpi": "FDI net inflows (USD billion)",
+  "value": 1.62,
+  "unit": "$bn",
+  "target": 100,
+  "source": "MISA / SAMA / World Bank",
+  "notes": "Pre-rebase. COVID-19 era trough."
+}, {
+  "year": 2021,
+  "kpi": "FDI net inflows (USD billion)",
+  "value": 19.29,
+  "unit": "$bn",
+  "target": 100,
+  "source": "MISA / SAMA / World Bank",
+  "notes": "New MISA methodology (2024 rebase) shows much higher figure than originally published; one-off Aramco infrastructure deal contributed materially."
+}, {
+  "year": 2022,
+  "kpi": "FDI net inflows (USD billion)",
+  "value": 26.71,
+  "unit": "$bn",
+  "target": 100,
+  "source": "MISA / SAMA / World Bank",
+  "notes": "New MISA methodology. New figures ~62% higher than old statistics for 2020-22 combined, partly reflecting a large Aramco pipeline deal."
+}, {
+  "year": 2023,
+  "kpi": "FDI net inflows (USD billion)",
+  "value": 25.6,
+  "unit": "$bn",
+  "target": 100,
+  "source": "MISA / SAMA / World Bank",
+  "notes": "MISA official 2023 report: SAR 96bn (~$25.6bn), 16% above the National Investment Strategy target for the year."
+}, {
+  "year": 2024,
+  "kpi": "FDI net inflows (USD billion)",
+  "value": 22,
+  "unit": "$bn",
+  "target": 100,
+  "source": "MISA / SAMA / World Bank",
+  "notes": "Indicative — official 2024 full-year MISA report figure; treat as approximate pending confirmation against final MISA annual report."
+}, {
+  "year": 2025,
+  "kpi": "FDI net inflows (USD billion)",
+  "value": 24,
+  "unit": "$bn",
+  "target": 100,
+  "source": "MISA / SAMA / World Bank",
+  "notes": "Indicative estimate based on quarterly net FDI run-rate reported by SAMA/CEIC through 2025; confirm against final MISA 2025 annual report before citing precisely."
+}, {
+  "year": 2016,
+  "kpi": "SME contribution to GDP (%)",
+  "value": 20,
+  "unit": "%",
+  "target": 35,
+  "source": "Monsha'at",
+  "notes": "Monsha'at baseline at program launch."
+}, {
+  "year": 2017,
+  "kpi": "SME contribution to GDP (%)",
+  "value": 20,
+  "unit": "%",
+  "target": 35,
+  "source": "Monsha'at",
+  "notes": "Monsha'at — limited annual movement reported in early years."
+}, {
+  "year": 2018,
+  "kpi": "SME contribution to GDP (%)",
+  "value": 20,
+  "unit": "%",
+  "target": 35,
+  "source": "Monsha'at",
+  "notes": "Monsha'at SME Monitor."
+}, {
+  "year": 2019,
+  "kpi": "SME contribution to GDP (%)",
+  "value": 22,
+  "unit": "%",
+  "target": 35,
+  "source": "Monsha'at",
+  "notes": "Monsha'at SME Monitor reports gradual increase."
+}, {
+  "year": 2020,
+  "kpi": "SME contribution to GDP (%)",
+  "value": 22,
+  "unit": "%",
+  "target": 35,
+  "source": "Monsha'at",
+  "notes": "Monsha'at — COVID-19 period; growth plateaued."
+}, {
+  "year": 2021,
+  "kpi": "SME contribution to GDP (%)",
+  "value": 23,
+  "unit": "%",
+  "target": 35,
+  "source": "Monsha'at",
+  "notes": "Argaam-reported Monsha'at governor statement put SME GDP contribution at 28.7% in March 2021 — note this figure has not been consistently repeated in later official communications, illustrating reporting volatility in this KPI."
+}, {
+  "year": 2022,
+  "kpi": "SME contribution to GDP (%)",
+  "value": 23,
+  "unit": "%",
+  "target": 35,
+  "source": "Monsha'at",
+  "notes": "Monsha'at SME Monitor / Investment Climate Statement series."
+}, {
+  "year": 2023,
+  "kpi": "SME contribution to GDP (%)",
+  "value": 23,
+  "unit": "%",
+  "target": 35,
+  "source": "Monsha'at",
+  "notes": "Most frequently cited figure across 2023-2025 secondary sources (~23%)."
+}, {
+  "year": 2024,
+  "kpi": "SME contribution to GDP (%)",
+  "value": 23,
+  "unit": "%",
+  "target": 35,
+  "source": "Monsha'at",
+  "notes": "Monsha'at — active SME registrations reached record highs (1.7M by 2025) but GDP-share metric is reported infrequently/inconsistently."
+}, {
+  "year": 2025,
+  "kpi": "SME contribution to GDP (%)",
+  "value": 23,
+  "unit": "%",
+  "target": 35,
+  "source": "Monsha'at",
+  "notes": "Held flat in most recent secondary reporting; official Monsha'at GDP-contribution figure for 2025 not yet located in a single authoritative bulletin — flagged as lowest-confidence series in this dataset."
+}];
+const safeFmt = fn => v => typeof v === 'number' && !isNaN(v) ? fn(v) : '—';
+const KPIS = [{
+  key: "Non-oil GDP contribution (% of real GDP)",
+  short: "Non-Oil GDP Share",
+  pillar: "A Thriving Economy",
+  direction: "up",
+  target: 65,
+  fmt: safeFmt(v => `${v.toFixed(1)}%`),
+  breakYear: null
+}, {
+  key: "Saudi national unemployment rate (%)",
+  short: "National Unemployment",
+  pillar: "A Vibrant Society",
+  direction: "down",
+  target: 5,
+  fmt: safeFmt(v => `${v.toFixed(1)}%`),
+  breakYear: null
+}, {
+  key: "FDI net inflows (USD billion)",
+  short: "FDI Net Inflows",
+  pillar: "An Ambitious Nation",
+  direction: "up",
+  target: 100,
+  fmt: safeFmt(v => `$${v.toFixed(1)}bn`),
+  breakYear: 2024
+}, {
+  key: "SME contribution to GDP (%)",
+  short: "SME GDP Contribution",
+  pillar: "A Thriving Economy",
+  direction: "up",
+  target: 35,
+  fmt: safeFmt(v => `${v.toFixed(1)}%`),
+  breakYear: null
+}];
 function rolling3(series) {
   return series.map((d, i) => {
     const window = series.slice(Math.max(0, i - 2), i + 1);
     const avg = window.reduce((s, x) => s + x.value, 0) / window.length;
-    return { ...d, rolling: avg };
+    return {
+      ...d,
+      rolling: avg
+    };
   });
 }
-
-const STATUS_COLOR = { on: '#1B7A5A', improving: '#C9A24B', stalled: '#B23A2F', off: '#B23A2F' };
-const STATUS_LABEL = { on: 'On Track', improving: 'Improving', stalled: 'Stalled', off: 'Off Track' };
-
+const STATUS_COLOR = {
+  on: '#1B7A5A',
+  improving: '#C9A24B',
+  stalled: '#B23A2F',
+  off: '#B23A2F'
+};
+const STATUS_LABEL = {
+  on: 'On Track',
+  improving: 'Improving',
+  stalled: 'Stalled',
+  off: 'Off Track'
+};
 function statusOf(kpi, series) {
   const latest = series[series.length - 1];
   const variance = (latest.value - kpi.target) / kpi.target;
@@ -56,346 +422,640 @@ function statusOf(kpi, series) {
   const first = window[0].value;
   const last = window[window.length - 1].value;
   const movingRight = kpi.direction === "down" ? last < first : last > first;
-
   return movingRight ? "improving" : "stalled";
 }
-
 function Dashboard() {
   const [activeIdx, setActiveIdx] = React.useState(0);
   const [hoverPoint, setHoverPoint] = React.useState(null);
   const active = KPIS[activeIdx];
-
   const series = React.useMemo(() => {
     const raw = RAW.filter(d => d.kpi === active.key).sort((a, b) => a.year - b.year);
     return rolling3(raw);
   }, [active]);
-
   const latest = series[series.length - 1];
   const prior = series[series.length - 2];
-  const yoy = prior ? ((latest.value - prior.value) / prior.value) * 100 : null;
-  const varToTarget = ((latest.value - active.target) / active.target) * 100;
+  const yoy = prior ? (latest.value - prior.value) / prior.value * 100 : null;
+  const varToTarget = (latest.value - active.target) / active.target * 100;
   const status = statusOf(active, series);
-
   const yoySeries = series.map((d, i) => {
-    if (i === 0) return { ...d, yoy: null };
+    if (i === 0) return {
+      ...d,
+      yoy: null
+    };
     const p = series[i - 1];
-    return { ...d, yoy: ((d.value - p.value) / p.value) * 100 };
+    return {
+      ...d,
+      yoy: (d.value - p.value) / p.value * 100
+    };
   });
-
-  return (
-    <div style={{
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
       fontFamily: "'Archivo', 'Inter', sans-serif",
       background: '#F7F5F0',
       minHeight: '100%',
       padding: '0',
-      color: '#0B1F3A',
-    }}>
-      <style>{`
+      color: '#0B1F3A'
+    }
+  }, /*#__PURE__*/React.createElement("style", null, `
         @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
         .mono { font-family: 'JetBrains Mono', monospace; }
         .kpi-tab { transition: all 0.15s ease; cursor: pointer; }
         .kpi-tab:hover { background: #0B1F3A0a; }
-      `}</style>
-
-      {/* Header band */}
-      <div style={{ background: '#0B1F3A', padding: '28px 32px 24px', borderBottom: '3px solid #C9A24B' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
-          <div>
-            <div style={{ color: '#C9A24B', fontSize: 11, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: 6 }}>
-              Vision 2030 · Economic Diversification Tracker
-            </div>
-            <h1 style={{ color: '#F7F5F0', fontSize: 26, fontWeight: 800, margin: 0, letterSpacing: '-0.01em' }}>
-              KPI Intelligence Dashboard
-            </h1>
-          </div>
-          <div className="mono" style={{ color: '#8FA0BC', fontSize: 12, textAlign: 'right' }}>
-            DATA WINDOW: 2016–2025<br/>SOURCES: GASTAT · MISA · MONSHA'AT
-          </div>
-        </div>
-      </div>
-
-      {/* KPI selector tabs */}
-      <div style={{ display: 'flex', borderBottom: '1px solid #0B1F3A1a', background: '#FFFFFF' }}>
-        {KPIS.map((k, i) => {
-          const isActive = i === activeIdx;
-          const kSeries = RAW.filter(d => d.kpi === k.key).sort((a, b) => a.year - b.year);
-          const last = kSeries[kSeries.length - 1];
-          const st = statusOf(k, kSeries);
-          return (
-            <div key={k.key} className="kpi-tab" onClick={() => { setActiveIdx(i); setHoverPoint(null); }}
-              style={{
-                flex: 1, padding: '14px 18px', borderBottom: isActive ? '3px solid #C9A24B' : '3px solid transparent',
-                background: isActive ? '#0B1F3A06' : 'transparent',
-              }}>
-              <div style={{ fontSize: 10, color: '#5A6472', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{k.pillar}</div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: '#0B1F3A', marginTop: 2 }}>{k.short}</div>
-              <div className="mono" style={{ fontSize: 18, fontWeight: 600, marginTop: 4, color: STATUS_COLOR[st] }}>
-                {k.fmt(last.value)}
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <div style={{ padding: '24px 32px 40px' }}>
-        {/* Card row */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 24 }}>
-          <Card label="Current Value" value={active.fmt(latest.value)} sub={`as of ${latest.year}`} />
-          <Card label="2030 Target" value={active.fmt(active.target)} sub={active.direction === 'down' ? 'lower is better' : 'higher is better'} />
-          <Card label="YoY Variance" value={yoy === null ? '—' : `${yoy > 0 ? '+' : ''}${yoy.toFixed(1)}%`}
-            sub={`${latest.year - 1} → ${latest.year}`}
-            tone={yoy === null ? 'neutral' : (active.direction === 'down' ? yoy < 0 : yoy > 0) ? 'good' : 'bad'} />
-          <Card label="Status" value={STATUS_LABEL[status]}
-            sub={`${varToTarget > 0 ? '+' : ''}${varToTarget.toFixed(1)}% vs target`}
-            color={STATUS_COLOR[status]} />
-        </div>
-
-        {/* Methodology flag, if relevant */}
-        {active.breakYear && (
-          <div style={{
-            background: '#C9A24B14', border: '1px solid #C9A24B55', borderRadius: 4,
-            padding: '10px 14px', marginBottom: 20, fontSize: 13, color: '#0B1F3A', display: 'flex', gap: 10, alignItems: 'flex-start'
-          }}>
-            <span style={{ color: '#C9A24B', fontWeight: 800, fontSize: 15 }}>⚑</span>
-            <span><strong>Methodology break at {active.breakYear}:</strong> MISA/GASTAT/SAMA revised the FDI calculation methodology in 2024 with IMF assistance. Pre- and post-{active.breakYear} figures are not directly comparable — see the marker on the chart below.</span>
-          </div>
-        )}
-
-        {/* Trend chart */}
-        <Panel title={`${active.short} — Trend & Rolling 3-Year Average`}>
-          <TrendChart series={series} kpi={active} hover={hoverPoint} setHover={setHoverPoint} />
-          <Legend items={[
-            { color: '#0B1F3A', label: 'Actual value', dash: false },
-            { color: '#1B7A5A', label: 'Rolling 3-year average', dash: true },
-            { color: '#C9A24B', label: '2030 target', dash: true },
-          ]} />
-        </Panel>
-
-        {/* YoY chart */}
-        <Panel title={`${active.short} — Year-over-Year Variance`}>
-          <YoYChart series={yoySeries} kpi={active} />
-        </Panel>
-
-        {/* Drill-down table */}
-        <Panel title="Sector Drill-Down — Full Series">
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-              <thead>
-                <tr style={{ borderBottom: '2px solid #0B1F3A' }}>
-                  {['Year', 'Value', 'Target', 'Variance', 'Status', 'Notes'].map(h => (
-                    <th key={h} style={{ textAlign: h === 'Notes' ? 'left' : 'right', padding: '8px 10px', fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#5A6472', fontWeight: 700 }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {series.slice().reverse().map((d) => {
-                  const v = ((d.value - active.target) / active.target) * 100;
-                  const idx = series.findIndex(s => s.year === d.year);
-                  const st = statusOf(active, series.slice(0, idx + 1));
-                  return (
-                    <tr key={d.year} style={{ borderBottom: '1px solid #0B1F3A0f' }}>
-                      <td className="mono" style={{ padding: '8px 10px', textAlign: 'right', fontWeight: 600 }}>{d.year}</td>
-                      <td className="mono" style={{ padding: '8px 10px', textAlign: 'right' }}>{active.fmt(d.value)}</td>
-                      <td className="mono" style={{ padding: '8px 10px', textAlign: 'right', color: '#5A6472' }}>{active.fmt(active.target)}</td>
-                      <td className="mono" style={{ padding: '8px 10px', textAlign: 'right', color: v >= 0 ? '#1B7A5A' : '#B23A2F' }}>
-                        {v > 0 ? '+' : ''}{v.toFixed(1)}%
-                      </td>
-                      <td style={{ padding: '8px 10px', textAlign: 'right' }}>
-                        <span style={{
-                          fontSize: 11, fontWeight: 700, padding: '2px 8px', borderRadius: 10,
-                          background: `${STATUS_COLOR[st]}18`,
-                          color: STATUS_COLOR[st],
-                        }}>{STATUS_LABEL[st].toUpperCase()}</span>
-                      </td>
-                      <td style={{ padding: '8px 10px', color: '#5A6472', maxWidth: 320, fontSize: 12, lineHeight: 1.4 }}>{d.notes}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </Panel>
-
-        <div style={{ marginTop: 8, fontSize: 11, color: '#8a92a0', lineHeight: 1.6 }}>
-          Built on publicly available data from GASTAT, MISA, and Monsha'at. "Saudi national unemployment rate" is used as the
-          national-level proxy for labour-market nationalization progress, since Saudization (Nitaqat) is implemented as
-          sector-specific quotas without a single published national percentage. FDI figures before/after 2024 reflect
-          different reporting methodologies and should not be compared without adjustment.
-        </div>
-      </div>
-    </div>
-  );
+      `), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: '#0B1F3A',
+      padding: '28px 32px 24px',
+      borderBottom: '3px solid #C9A24B'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'flex-start',
+      flexWrap: 'wrap',
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: '#C9A24B',
+      fontSize: 11,
+      fontWeight: 700,
+      letterSpacing: '0.12em',
+      textTransform: 'uppercase',
+      marginBottom: 6
+    }
+  }, "Vision 2030 · Economic Diversification Tracker"), /*#__PURE__*/React.createElement("h1", {
+    style: {
+      color: '#F7F5F0',
+      fontSize: 26,
+      fontWeight: 800,
+      margin: 0,
+      letterSpacing: '-0.01em'
+    }
+  }, "KPI Intelligence Dashboard")), /*#__PURE__*/React.createElement("div", {
+    className: "mono",
+    style: {
+      color: '#8FA0BC',
+      fontSize: 12,
+      textAlign: 'right'
+    }
+  }, "DATA WINDOW: 2016–2025", /*#__PURE__*/React.createElement("br", null), "SOURCES: GASTAT · MISA · MONSHA'AT"))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      borderBottom: '1px solid #0B1F3A1a',
+      background: '#FFFFFF'
+    }
+  }, KPIS.map((k, i) => {
+    const isActive = i === activeIdx;
+    const kSeries = RAW.filter(d => d.kpi === k.key).sort((a, b) => a.year - b.year);
+    const last = kSeries[kSeries.length - 1];
+    const st = statusOf(k, kSeries);
+    return /*#__PURE__*/React.createElement("div", {
+      key: k.key,
+      className: "kpi-tab",
+      onClick: () => {
+        setActiveIdx(i);
+        setHoverPoint(null);
+      },
+      style: {
+        flex: 1,
+        padding: '14px 18px',
+        borderBottom: isActive ? '3px solid #C9A24B' : '3px solid transparent',
+        background: isActive ? '#0B1F3A06' : 'transparent'
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 10,
+        color: '#5A6472',
+        fontWeight: 600,
+        letterSpacing: '0.06em',
+        textTransform: 'uppercase'
+      }
+    }, k.pillar), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 14,
+        fontWeight: 700,
+        color: '#0B1F3A',
+        marginTop: 2
+      }
+    }, k.short), /*#__PURE__*/React.createElement("div", {
+      className: "mono",
+      style: {
+        fontSize: 18,
+        fontWeight: 600,
+        marginTop: 4,
+        color: STATUS_COLOR[st]
+      }
+    }, k.fmt(last.value)));
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: '24px 32px 40px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'grid',
+      gridTemplateColumns: 'repeat(4, 1fr)',
+      gap: 14,
+      marginBottom: 24
+    }
+  }, /*#__PURE__*/React.createElement(Card, {
+    label: "Current Value",
+    value: active.fmt(latest.value),
+    sub: `as of ${latest.year}`
+  }), /*#__PURE__*/React.createElement(Card, {
+    label: "2030 Target",
+    value: active.fmt(active.target),
+    sub: active.direction === 'down' ? 'lower is better' : 'higher is better'
+  }), /*#__PURE__*/React.createElement(Card, {
+    label: "YoY Variance",
+    value: yoy === null ? '—' : `${yoy > 0 ? '+' : ''}${yoy.toFixed(1)}%`,
+    sub: `${latest.year - 1} → ${latest.year}`,
+    tone: yoy === null ? 'neutral' : (active.direction === 'down' ? yoy < 0 : yoy > 0) ? 'good' : 'bad'
+  }), /*#__PURE__*/React.createElement(Card, {
+    label: "Status",
+    value: STATUS_LABEL[status],
+    sub: `${varToTarget > 0 ? '+' : ''}${varToTarget.toFixed(1)}% vs target`,
+    color: STATUS_COLOR[status]
+  })), active.breakYear && /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: '#C9A24B14',
+      border: '1px solid #C9A24B55',
+      borderRadius: 4,
+      padding: '10px 14px',
+      marginBottom: 20,
+      fontSize: 13,
+      color: '#0B1F3A',
+      display: 'flex',
+      gap: 10,
+      alignItems: 'flex-start'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: '#C9A24B',
+      fontWeight: 800,
+      fontSize: 15
+    }
+  }, "⚑"), /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("strong", null, "Methodology break at ", active.breakYear, ":"), " MISA/GASTAT/SAMA revised the FDI calculation methodology in 2024 with IMF assistance. Pre- and post-", active.breakYear, " figures are not directly comparable — see the marker on the chart below.")), /*#__PURE__*/React.createElement(Panel, {
+    title: `${active.short} — Trend & Rolling 3-Year Average`
+  }, /*#__PURE__*/React.createElement(TrendChart, {
+    series: series,
+    kpi: active,
+    hover: hoverPoint,
+    setHover: setHoverPoint
+  }), /*#__PURE__*/React.createElement(Legend, {
+    items: [{
+      color: '#0B1F3A',
+      label: 'Actual value',
+      dash: false
+    }, {
+      color: '#1B7A5A',
+      label: 'Rolling 3-year average',
+      dash: true
+    }, {
+      color: '#C9A24B',
+      label: '2030 target',
+      dash: true
+    }]
+  })), /*#__PURE__*/React.createElement(Panel, {
+    title: `${active.short} — Year-over-Year Variance`
+  }, /*#__PURE__*/React.createElement(YoYChart, {
+    series: yoySeries,
+    kpi: active
+  })), /*#__PURE__*/React.createElement(Panel, {
+    title: "Sector Drill-Down — Full Series"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      overflowX: 'auto'
+    }
+  }, /*#__PURE__*/React.createElement("table", {
+    style: {
+      width: '100%',
+      borderCollapse: 'collapse',
+      fontSize: 13
+    }
+  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", {
+    style: {
+      borderBottom: '2px solid #0B1F3A'
+    }
+  }, ['Year', 'Value', 'Target', 'Variance', 'Status', 'Notes'].map(h => /*#__PURE__*/React.createElement("th", {
+    key: h,
+    style: {
+      textAlign: h === 'Notes' ? 'left' : 'right',
+      padding: '8px 10px',
+      fontSize: 11,
+      textTransform: 'uppercase',
+      letterSpacing: '0.05em',
+      color: '#5A6472',
+      fontWeight: 700
+    }
+  }, h)))), /*#__PURE__*/React.createElement("tbody", null, series.slice().reverse().map(d => {
+    const v = (d.value - active.target) / active.target * 100;
+    const idx = series.findIndex(s => s.year === d.year);
+    const st = statusOf(active, series.slice(0, idx + 1));
+    return /*#__PURE__*/React.createElement("tr", {
+      key: d.year,
+      style: {
+        borderBottom: '1px solid #0B1F3A0f'
+      }
+    }, /*#__PURE__*/React.createElement("td", {
+      className: "mono",
+      style: {
+        padding: '8px 10px',
+        textAlign: 'right',
+        fontWeight: 600
+      }
+    }, d.year), /*#__PURE__*/React.createElement("td", {
+      className: "mono",
+      style: {
+        padding: '8px 10px',
+        textAlign: 'right'
+      }
+    }, active.fmt(d.value)), /*#__PURE__*/React.createElement("td", {
+      className: "mono",
+      style: {
+        padding: '8px 10px',
+        textAlign: 'right',
+        color: '#5A6472'
+      }
+    }, active.fmt(active.target)), /*#__PURE__*/React.createElement("td", {
+      className: "mono",
+      style: {
+        padding: '8px 10px',
+        textAlign: 'right',
+        color: v >= 0 ? '#1B7A5A' : '#B23A2F'
+      }
+    }, v > 0 ? '+' : '', v.toFixed(1), "%"), /*#__PURE__*/React.createElement("td", {
+      style: {
+        padding: '8px 10px',
+        textAlign: 'right'
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 11,
+        fontWeight: 700,
+        padding: '2px 8px',
+        borderRadius: 10,
+        background: `${STATUS_COLOR[st]}18`,
+        color: STATUS_COLOR[st]
+      }
+    }, STATUS_LABEL[st].toUpperCase())), /*#__PURE__*/React.createElement("td", {
+      style: {
+        padding: '8px 10px',
+        color: '#5A6472',
+        maxWidth: 320,
+        fontSize: 12,
+        lineHeight: 1.4
+      }
+    }, d.notes));
+  }))))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 8,
+      fontSize: 11,
+      color: '#8a92a0',
+      lineHeight: 1.6
+    }
+  }, "Built on publicly available data from GASTAT, MISA, and Monsha'at. \"Saudi national unemployment rate\" is used as the national-level proxy for labour-market nationalization progress, since Saudization (Nitaqat) is implemented as sector-specific quotas without a single published national percentage. FDI figures before/after 2024 reflect different reporting methodologies and should not be compared without adjustment.")));
 }
-
-function Card({ label, value, sub, tone, color }) {
+function Card({
+  label,
+  value,
+  sub,
+  tone,
+  color
+}) {
   const toneColor = color || (tone === 'good' ? '#1B7A5A' : tone === 'bad' ? '#B23A2F' : '#0B1F3A');
-  return (
-    <div style={{ background: '#FFFFFF', border: '1px solid #0B1F3A14', borderRadius: 6, padding: '16px 18px' }}>
-      <div style={{ fontSize: 11, color: '#5A6472', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 8 }}>{label}</div>
-      <div className="mono" style={{ fontSize: 24, fontWeight: 700, color: toneColor, lineHeight: 1 }}>{value}</div>
-      <div style={{ fontSize: 12, color: '#5A6472', marginTop: 6 }}>{sub}</div>
-    </div>
-  );
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: '#FFFFFF',
+      border: '1px solid #0B1F3A14',
+      borderRadius: 6,
+      padding: '16px 18px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: '#5A6472',
+      fontWeight: 700,
+      textTransform: 'uppercase',
+      letterSpacing: '0.05em',
+      marginBottom: 8
+    }
+  }, label), /*#__PURE__*/React.createElement("div", {
+    className: "mono",
+    style: {
+      fontSize: 24,
+      fontWeight: 700,
+      color: toneColor,
+      lineHeight: 1
+    }
+  }, value), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: '#5A6472',
+      marginTop: 6
+    }
+  }, sub));
 }
-
-function Panel({ title, children }) {
-  return (
-    <div style={{ background: '#FFFFFF', border: '1px solid #0B1F3A14', borderRadius: 6, padding: '18px 20px', marginBottom: 18 }}>
-      <div style={{ fontSize: 13, fontWeight: 700, color: '#0B1F3A', marginBottom: 14, display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ width: 4, height: 14, background: '#C9A24B', display: 'inline-block', borderRadius: 1 }} />
-        {title}
-      </div>
-      {children}
-    </div>
-  );
+function Panel({
+  title,
+  children
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: '#FFFFFF',
+      border: '1px solid #0B1F3A14',
+      borderRadius: 6,
+      padding: '18px 20px',
+      marginBottom: 18
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 700,
+      color: '#0B1F3A',
+      marginBottom: 14,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      width: 4,
+      height: 14,
+      background: '#C9A24B',
+      display: 'inline-block',
+      borderRadius: 1
+    }
+  }), title), children);
 }
-
-function Legend({ items }) {
-  return (
-    <div style={{ display: 'flex', gap: 18, marginTop: 8, flexWrap: 'wrap' }}>
-      {items.map(it => (
-        <div key={it.label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#5A6472' }}>
-          <span style={{ width: 14, height: it.dash ? 0 : 2, borderTop: `2px ${it.dash ? 'dashed' : 'solid'} ${it.color}` }} />
-          {it.label}
-        </div>
-      ))}
-    </div>
-  );
+function Legend({
+  items
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 18,
+      marginTop: 8,
+      flexWrap: 'wrap'
+    }
+  }, items.map(it => /*#__PURE__*/React.createElement("div", {
+    key: it.label,
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 6,
+      fontSize: 11,
+      color: '#5A6472'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      width: 14,
+      height: it.dash ? 0 : 2,
+      borderTop: `2px ${it.dash ? 'dashed' : 'solid'} ${it.color}`
+    }
+  }), it.label)));
 }
-
-function TrendChart({ series, kpi, hover, setHover }) {
-  const W = 700, H = 280;
-  const padL = 48, padR = 24, padT = 20, padB = 32;
+function TrendChart({
+  series,
+  kpi,
+  hover,
+  setHover
+}) {
+  const W = 700,
+    H = 280;
+  const padL = 48,
+    padR = 24,
+    padT = 20,
+    padB = 32;
   const plotW = W - padL - padR;
   const plotH = H - padT - padB;
-
   const values = series.map(d => d.value);
   const rollingValues = series.map(d => d.rolling);
   const allVals = [...values, ...rollingValues, kpi.target];
   const minV = Math.min(...allVals) * 0.92;
   const maxV = Math.max(...allVals) * 1.08;
-
-  const x = (i) => padL + (i / (series.length - 1)) * plotW;
-  const y = (v) => padT + plotH - ((v - minV) / (maxV - minV)) * plotH;
-
-  const linePath = (key) => series.map((d, i) => `${i === 0 ? 'M' : 'L'} ${x(i)} ${y(d[key])}`).join(' ');
-
+  const x = i => padL + i / (series.length - 1) * plotW;
+  const y = v => padT + plotH - (v - minV) / (maxV - minV) * plotH;
+  const linePath = key => series.map((d, i) => `${i === 0 ? 'M' : 'L'} ${x(i)} ${y(d[key])}`).join(' ');
   const yTicks = 4;
-  const tickVals = Array.from({ length: yTicks + 1 }, (_, i) => minV + (i / yTicks) * (maxV - minV));
-
+  const tickVals = Array.from({
+    length: yTicks + 1
+  }, (_, i) => minV + i / yTicks * (maxV - minV));
   const breakIdx = kpi.breakYear ? series.findIndex(d => d.year === kpi.breakYear) : -1;
-
-  return (
-    <div style={{ position: 'relative' }}>
-      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 280, display: 'block' }}>
-        {/* grid lines */}
-        {tickVals.map((tv, i) => (
-          <g key={i}>
-            <line x1={padL} x2={W - padR} y1={y(tv)} y2={y(tv)} stroke="#0B1F3A12" strokeDasharray="3 3" />
-            <text x={padL - 8} y={y(tv)} textAnchor="end" dominantBaseline="middle" fontSize="10" fontFamily="JetBrains Mono" fill="#5A6472">
-              {tv.toFixed(0)}
-            </text>
-          </g>
-        ))}
-        {/* x axis labels */}
-        {series.map((d, i) => (
-          <text key={d.year} x={x(i)} y={H - 10} textAnchor="middle" fontSize="10" fontFamily="JetBrains Mono" fill="#5A6472">
-            {d.year}
-          </text>
-        ))}
-        {/* target line */}
-        <line x1={padL} x2={W - padR} y1={y(kpi.target)} y2={y(kpi.target)} stroke="#C9A24B" strokeDasharray="4 4" strokeWidth="1.5" />
-        <text x={W - padR} y={y(kpi.target) - 6} textAnchor="end" fontSize="11" fontWeight="600" fill="#C9A24B">
-          2030 target: {kpi.fmt(kpi.target)}
-        </text>
-        {/* methodology break marker */}
-        {breakIdx >= 0 && (
-          <g>
-            <line x1={x(breakIdx)} x2={x(breakIdx)} y1={padT} y2={padT + plotH} stroke="#B23A2F" strokeDasharray="2 2" strokeWidth="1.5" />
-            <text x={x(breakIdx) + 4} y={padT + 10} fontSize="10" fontWeight="600" fill="#B23A2F">methodology rebase</text>
-          </g>
-        )}
-        {/* rolling average line */}
-        <path d={linePath('rolling')} fill="none" stroke="#1B7A5A" strokeWidth="2" strokeDasharray="5 3" />
-        {/* actual line */}
-        <path d={linePath('value')} fill="none" stroke="#0B1F3A" strokeWidth="2.5" />
-        {/* dots + hover targets */}
-        {series.map((d, i) => (
-          <g key={d.year}>
-            <circle cx={x(i)} cy={y(d.value)} r="3" fill="#0B1F3A" />
-            <circle cx={x(i)} cy={y(d.value)} r="10" fill="transparent"
-              onMouseEnter={() => setHover({ ...d, cx: x(i), cy: y(d.value) })}
-              onMouseLeave={() => setHover(null)}
-              style={{ cursor: 'pointer' }} />
-          </g>
-        ))}
-      </svg>
-      {hover && (
-        <div style={{
-          position: 'absolute', left: `${(hover.cx / W) * 100}%`, top: Math.max(0, (hover.cy / H) * 280 - 70),
-          transform: 'translateX(-50%)', background: '#0B1F3A', color: '#F7F5F0', padding: '8px 10px',
-          borderRadius: 4, fontSize: 12, maxWidth: 220, pointerEvents: 'none', zIndex: 10,
-        }}>
-          <div className="mono" style={{ fontWeight: 700, marginBottom: 4 }}>{hover.year}: {kpi.fmt(hover.value)}</div>
-          <div style={{ color: '#8FA0BC', lineHeight: 1.4, fontSize: 11 }}>{hover.notes}</div>
-        </div>
-      )}
-    </div>
-  );
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'relative'
+    }
+  }, /*#__PURE__*/React.createElement("svg", {
+    viewBox: `0 0 ${W} ${H}`,
+    style: {
+      width: '100%',
+      height: 280,
+      display: 'block'
+    }
+  }, tickVals.map((tv, i) => /*#__PURE__*/React.createElement("g", {
+    key: i
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: padL,
+    x2: W - padR,
+    y1: y(tv),
+    y2: y(tv),
+    stroke: "#0B1F3A12",
+    strokeDasharray: "3 3"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: padL - 8,
+    y: y(tv),
+    textAnchor: "end",
+    dominantBaseline: "middle",
+    fontSize: "10",
+    fontFamily: "JetBrains Mono",
+    fill: "#5A6472"
+  }, tv.toFixed(0)))), series.map((d, i) => /*#__PURE__*/React.createElement("text", {
+    key: d.year,
+    x: x(i),
+    y: H - 10,
+    textAnchor: "middle",
+    fontSize: "10",
+    fontFamily: "JetBrains Mono",
+    fill: "#5A6472"
+  }, d.year)), /*#__PURE__*/React.createElement("line", {
+    x1: padL,
+    x2: W - padR,
+    y1: y(kpi.target),
+    y2: y(kpi.target),
+    stroke: "#C9A24B",
+    strokeDasharray: "4 4",
+    strokeWidth: "1.5"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: W - padR,
+    y: y(kpi.target) - 6,
+    textAnchor: "end",
+    fontSize: "11",
+    fontWeight: "600",
+    fill: "#C9A24B"
+  }, "2030 target: ", kpi.fmt(kpi.target)), breakIdx >= 0 && /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("line", {
+    x1: x(breakIdx),
+    x2: x(breakIdx),
+    y1: padT,
+    y2: padT + plotH,
+    stroke: "#B23A2F",
+    strokeDasharray: "2 2",
+    strokeWidth: "1.5"
+  }), /*#__PURE__*/React.createElement("text", {
+    x: x(breakIdx) + 4,
+    y: padT + 10,
+    fontSize: "10",
+    fontWeight: "600",
+    fill: "#B23A2F"
+  }, "methodology rebase")), /*#__PURE__*/React.createElement("path", {
+    d: linePath('rolling'),
+    fill: "none",
+    stroke: "#1B7A5A",
+    strokeWidth: "2",
+    strokeDasharray: "5 3"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: linePath('value'),
+    fill: "none",
+    stroke: "#0B1F3A",
+    strokeWidth: "2.5"
+  }), series.map((d, i) => /*#__PURE__*/React.createElement("g", {
+    key: d.year
+  }, /*#__PURE__*/React.createElement("circle", {
+    cx: x(i),
+    cy: y(d.value),
+    r: "3",
+    fill: "#0B1F3A"
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: x(i),
+    cy: y(d.value),
+    r: "10",
+    fill: "transparent",
+    onMouseEnter: () => setHover({
+      ...d,
+      cx: x(i),
+      cy: y(d.value)
+    }),
+    onMouseLeave: () => setHover(null),
+    style: {
+      cursor: 'pointer'
+    }
+  })))), hover && /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'absolute',
+      left: `${hover.cx / W * 100}%`,
+      top: Math.max(0, hover.cy / H * 280 - 70),
+      transform: 'translateX(-50%)',
+      background: '#0B1F3A',
+      color: '#F7F5F0',
+      padding: '8px 10px',
+      borderRadius: 4,
+      fontSize: 12,
+      maxWidth: 220,
+      pointerEvents: 'none',
+      zIndex: 10
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "mono",
+    style: {
+      fontWeight: 700,
+      marginBottom: 4
+    }
+  }, hover.year, ": ", kpi.fmt(hover.value)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      color: '#8FA0BC',
+      lineHeight: 1.4,
+      fontSize: 11
+    }
+  }, hover.notes)));
 }
-
-function YoYChart({ series, kpi }) {
+function YoYChart({
+  series,
+  kpi
+}) {
   const [hoverIdx, setHoverIdx] = React.useState(null);
   const pts = series.filter(d => d.yoy !== null);
-  const W = 700, H = 200;
-  const padL = 44, padR = 24, padT = 16, padB = 28;
+  const W = 700,
+    H = 200;
+  const padL = 44,
+    padR = 24,
+    padT = 16,
+    padB = 28;
   const plotW = W - padL - padR;
   const plotH = H - padT - padB;
-
   const vals = pts.map(d => d.yoy);
   const maxAbs = Math.max(Math.abs(Math.min(...vals)), Math.abs(Math.max(...vals))) * 1.2 || 1;
-  const minV = -maxAbs, maxV = maxAbs;
-
+  const minV = -maxAbs,
+    maxV = maxAbs;
   const barW = plotW / pts.length * 0.6;
-  const x = (i) => padL + (i + 0.5) / pts.length * plotW;
-  const y = (v) => padT + plotH - ((v - minV) / (maxV - minV)) * plotH;
+  const x = i => padL + (i + 0.5) / pts.length * plotW;
+  const y = v => padT + plotH - (v - minV) / (maxV - minV) * plotH;
   const zeroY = y(0);
-
-  return (
-    <div style={{ position: 'relative' }}>
-      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 200, display: 'block' }}>
-        <line x1={padL} x2={W - padR} y1={zeroY} y2={zeroY} stroke="#0B1F3A44" />
-        {pts.map((d, i) => {
-          const good = kpi.direction === 'down' ? d.yoy < 0 : d.yoy > 0;
-          const barTop = Math.min(zeroY, y(d.yoy));
-          const barH = Math.abs(y(d.yoy) - zeroY);
-          return (
-            <g key={d.year}>
-              <rect x={x(i) - barW / 2} y={barTop} width={barW} height={Math.max(barH, 1)}
-                fill={good ? '#1B7A5A' : '#B23A2F'} rx="2"
-                onMouseEnter={() => setHoverIdx(i)} onMouseLeave={() => setHoverIdx(null)}
-                style={{ cursor: 'pointer' }} />
-              <text x={x(i)} y={H - 8} textAnchor="middle" fontSize="10" fontFamily="JetBrains Mono" fill="#5A6472">{d.year}</text>
-            </g>
-          );
-        })}
-      </svg>
-      {hoverIdx !== null && (
-        <div style={{
-          position: 'absolute', left: `${(x(hoverIdx) / W) * 100}%`, top: 0,
-          transform: 'translateX(-50%)', background: '#0B1F3A', color: '#F7F5F0', padding: '6px 10px',
-          borderRadius: 4, fontSize: 12, pointerEvents: 'none', whiteSpace: 'nowrap',
-        }} className="mono">
-          {pts[hoverIdx].year}: {pts[hoverIdx].yoy > 0 ? '+' : ''}{pts[hoverIdx].yoy.toFixed(1)}%
-        </div>
-      )}
-    </div>
-  );
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'relative'
+    }
+  }, /*#__PURE__*/React.createElement("svg", {
+    viewBox: `0 0 ${W} ${H}`,
+    style: {
+      width: '100%',
+      height: 200,
+      display: 'block'
+    }
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: padL,
+    x2: W - padR,
+    y1: zeroY,
+    y2: zeroY,
+    stroke: "#0B1F3A44"
+  }), pts.map((d, i) => {
+    const good = kpi.direction === 'down' ? d.yoy < 0 : d.yoy > 0;
+    const barTop = Math.min(zeroY, y(d.yoy));
+    const barH = Math.abs(y(d.yoy) - zeroY);
+    return /*#__PURE__*/React.createElement("g", {
+      key: d.year
+    }, /*#__PURE__*/React.createElement("rect", {
+      x: x(i) - barW / 2,
+      y: barTop,
+      width: barW,
+      height: Math.max(barH, 1),
+      fill: good ? '#1B7A5A' : '#B23A2F',
+      rx: "2",
+      onMouseEnter: () => setHoverIdx(i),
+      onMouseLeave: () => setHoverIdx(null),
+      style: {
+        cursor: 'pointer'
+      }
+    }), /*#__PURE__*/React.createElement("text", {
+      x: x(i),
+      y: H - 8,
+      textAnchor: "middle",
+      fontSize: "10",
+      fontFamily: "JetBrains Mono",
+      fill: "#5A6472"
+    }, d.year));
+  })), hoverIdx !== null && /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'absolute',
+      left: `${x(hoverIdx) / W * 100}%`,
+      top: 0,
+      transform: 'translateX(-50%)',
+      background: '#0B1F3A',
+      color: '#F7F5F0',
+      padding: '6px 10px',
+      borderRadius: 4,
+      fontSize: 12,
+      pointerEvents: 'none',
+      whiteSpace: 'nowrap'
+    },
+    className: "mono"
+  }, pts[hoverIdx].year, ": ", pts[hoverIdx].yoy > 0 ? '+' : '', pts[hoverIdx].yoy.toFixed(1), "%"));
 }
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<Dashboard />);
+root.render(React.createElement(Dashboard));
+
+}
 </script>
 </body>
 </html>
