@@ -1,0 +1,143 @@
+# DAX Measures — Saudi Vision 2030 KPI Dashboard
+# Paste these into Power BI Desktop: Modeling tab -> New Measure (one at a time)
+# Table assumed name: KPI_Data  (loaded from Vision2030_KPI_Dataset.xlsx, sheet "KPI_Data")
+# Each measure includes a plain-English explanation — read this before the interview, not just the code.
+
+# -----------------------------------------------------------------
+# 1. CURRENT VALUE (the base measure most visuals will use)
+# -----------------------------------------------------------------
+Current Value =
+SUM ( KPI_Data[Value] )
+
+# Why: Value is one row per Year x KPI, so SUM works as long as your visual
+# filters to a single KPI (via slicer) and a single/selected year range.
+# This is your foundation measure — almost everything else builds on it.
+
+
+# -----------------------------------------------------------------
+# 2. PRIOR YEAR VALUE (needed for YoY variance)
+# -----------------------------------------------------------------
+Prior Year Value =
+CALCULATE (
+    SUM ( KPI_Data[Value] ),
+    DATEADD ( KPI_Data[Year], -1, YEAR )
+)
+
+# Problem: DATEADD needs a proper Date column marked as a Date table in the
+# model, not a plain Year integer. Since this dataset only has whole years
+# (not full dates), use the simpler, more robust version below instead —
+# this is the version I'd actually recommend you use and explain:
+
+Prior Year Value (robust) =
+VAR CurrentYear = MAX ( KPI_Data[Year] )
+RETURN
+CALCULATE (
+    SUM ( KPI_Data[Value] ),
+    FILTER ( ALL ( KPI_Data ), KPI_Data[Year] = CurrentYear - 1 )
+)
+
+# Why this approach: with only a Year (integer) column rather than a full
+# date hierarchy, FILTER + ALL is more transparent and easier to defend
+# in an interview than DATEADD, which expects a marked date table.
+# ALL() removes existing filters on Year so we can reach back to last year
+# even though the visual is filtered to the current year.
+
+
+# -----------------------------------------------------------------
+# 3. YEAR-OVER-YEAR VARIANCE (%)
+# -----------------------------------------------------------------
+YoY Variance % =
+VAR Curr = [Current Value]
+VAR Prior = [Prior Year Value (robust)]
+RETURN
+DIVIDE ( Curr - Prior, Prior )
+
+# Why DIVIDE() instead of "/" : DIVIDE handles divide-by-zero gracefully,
+# returning BLANK() instead of an error. This matters for 2016 (the first
+# year in the series), which has no prior year to compare against —
+# a plain "/" would throw an error on the very first bar of your chart.
+
+
+# -----------------------------------------------------------------
+# 4. ROLLING 3-YEAR AVERAGE
+# -----------------------------------------------------------------
+Rolling 3Y Average =
+VAR CurrentYear = MAX ( KPI_Data[Year] )
+RETURN
+CALCULATE (
+    AVERAGE ( KPI_Data[Value] ),
+    FILTER (
+        ALL ( KPI_Data ),
+        KPI_Data[Year] <= CurrentYear &&
+        KPI_Data[Year] > CurrentYear - 3
+    )
+)
+
+# Why: smooths out single-year noise (e.g., the FDI methodology break, or
+# the 2020 COVID shock in unemployment) so the trend line in the dashboard
+# tells a clearer diversification story than the raw annual figure alone.
+# This is exactly the kind of "rolling average" your CV bullet claims —
+# make sure you can explain that ALL() is what lets the window slide
+# correctly even when a slicer has filtered the visual to one year.
+
+
+# -----------------------------------------------------------------
+# 5. TARGET VALUE (2030 target, constant across years)
+# -----------------------------------------------------------------
+Target 2030 =
+SELECTEDVALUE ( KPI_Data[Target_2030] )
+
+# Why SELECTEDVALUE not SUM/MAX: Target_2030 repeats the same number on
+# every row for a given KPI (it's a constant, not something to total).
+# SELECTEDVALUE returns that single value cleanly, and returns BLANK if
+# more than one KPI is selected at once — which is the correct, safe
+# behaviour (you don't want to silently average two unrelated targets).
+
+
+# -----------------------------------------------------------------
+# 6. TARGET VS ACTUAL VARIANCE (the scorecard measure)
+# -----------------------------------------------------------------
+Variance to Target =
+[Current Value] - [Target 2030]
+
+Variance to Target % =
+DIVIDE ( [Current Value] - [Target 2030], [Target 2030] )
+
+# Why two versions: the absolute variance (e.g., "-10 percentage points")
+# is easiest to read on a scorecard; the % version lets you compare
+# progress across KPIs with very different units ($bn FDI vs. % GDP share)
+# on a single normalized "progress to goal" visual.
+
+
+# -----------------------------------------------------------------
+# 7. STATUS FLAG (for conditional formatting / KPI cards)
+# -----------------------------------------------------------------
+KPI Status =
+VAR Variance = [Variance to Target %]
+VAR Direction = SELECTEDVALUE ( KPI_Dimension[Direction (Good if...)] )
+RETURN
+SWITCH (
+    TRUE (),
+    ISBLANK ( Variance ), "No data",
+    Direction = "Decreasing" && Variance <= 0, "On track",
+    Direction = "Decreasing" && Variance > 0, "Off track",
+    Direction = "Increasing" && Variance >= 0, "On track",
+    Direction = "Increasing" && Variance < 0, "Off track",
+    "Review"
+)
+
+# Why this needs the KPI_Dimension table: unemployment is "good" when it
+# goes DOWN, while FDI/SME/non-oil share are "good" when they go UP.
+# A single hardcoded "higher is better" rule would silently mislabel the
+# unemployment KPI as failing when it's actually improving. This measure
+# is the one most worth walking an interviewer through, since it shows
+# you modeled the *business logic* of the KPIs, not just the chart.
+
+
+# -----------------------------------------------------------------
+# RELATIONSHIPS NEEDED IN THE MODEL (Model view, not DAX)
+# -----------------------------------------------------------------
+# KPI_Data[KPI]  (many)  -->  (one)  KPI_Dimension[KPI]
+# Build this as a standard one-to-many relationship via drag-and-drop in
+# Power BI's Model view. This is what lets KPI Status pull the correct
+# "Direction" for whichever KPI is currently filtered/selected.
